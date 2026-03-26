@@ -1,0 +1,878 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Imagery Task</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            line-height: 1.6;
+            background: linear-gradient(135deg, #62646d 0%, #333134 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .section {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            margin: 20px 0;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            display: none;
+        }
+
+        .section.active {
+            display: block;
+        }
+
+        h1, h2 {
+            text-align: center;
+            margin-bottom: 20px;
+            color: #4a5568;
+        }
+
+        h1 {
+            font-size: 2.5em;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #4a5568;
+        }
+
+        input[type="text"], input[type="number"], input[type="email"], input[type="tel"] {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s ease;
+        }
+
+        input[type="text"]:focus, input[type="number"]:focus, input[type="email"]:focus, input[type="tel"]:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 16px;
+        }
+
+        .btn {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 25px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            display: block;
+            margin: 20px auto;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .question-container {
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        .question-text {
+            font-size: 18px;
+            margin-bottom: 20px;
+            color: #4a5568;
+            line-height: 1.8;
+        }
+
+        .choices {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin: 20px 0;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .choice-btn {
+            background: #f7fafc;
+            border: 2px solid #e2e8f0;
+            padding: 20px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 16px;
+            text-align: left;
+            line-height: 1.4;
+        }
+
+        .choice-btn:hover {
+            background: #edf2f7;
+            border-color: #667eea;
+        }
+
+        .choice-btn.selected {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 10px;
+            background: #e2e8f0;
+            border-radius: 5px;
+            margin: 20px 0;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        .stimulus-container {
+            text-align: center;
+            margin: 30px 0;
+        }
+
+        .stimulus-image {
+            max-width: 600px;
+            max-height: 600px;
+            border-radius: 10px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            margin: 20px auto;
+        }
+
+        .answer-input {
+            width: 300px;
+            margin: 20px auto;
+        }
+
+        .feedback {
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+            font-weight: bold;
+            text-align: center;
+        }
+
+        .feedback.correct {
+            background: #c6f6d5;
+            color: #22543d;
+            border: 2px solid #68d391;
+        }
+
+        .feedback.incorrect {
+            background: #fed7d7;
+            color: #742a2a;
+            border: 2px solid #fc8181;
+        }
+
+        .timer {
+            text-align: center;
+            font-size: 18px;
+            margin: 20px 0;
+            color: #4a5568;
+        }
+
+        .results {
+            background: #f7fafc;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .instruction-text {
+            background: #f8f9fa;
+            padding: 25px;
+            border-radius: 10px;
+            margin: 20px 0;
+            border-left: 4px solid #667eea;
+            line-height: 1.8;
+            font-size: 16px;
+            text-align: left;
+            max-height: 800px;
+            overflow-y: auto;
+        }
+
+        .instruction-text p {
+            margin-bottom: 15px;
+            color: #2d3748;
+        }
+
+        .instruction-text strong {
+            color: #1a202c;
+            font-weight: 600;
+        }
+
+        .button-row {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 30px;
+            flex-wrap: wrap;
+        }
+
+        .contact-note {
+            margin-top: 10px;
+            color: #4a5568;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+
+        <!-- Instruction Page -->
+        <div id="instruction-section" class="section active">
+            <h1>การศึกษาพฤติกรรมและความสามารถของการจินตนาการในประชากรไทย</h1>
+            
+            <div class="instruction-text">
+                <p><strong>เรียน ผู้สนใจเข้าร่วมการวิจัย</strong></p>
+                <p> ขอเรียนเชิญท่านที่สนใจเข้าร่วมการศึกษา "การศึกษาพฤติกรรมและความสามารถของการจินตนาการในประชากรไทยผ่านการทำแบบสอบถามและแบบทดสอบจินตนาการ" โดยการศึกษาดังกล่าวเป็นส่วนหนึ่งของโครงการวิจัยเรื่อง "การศึกษาพฤติกรรมและการทำงานของระบบประสาทด้วยคลื่นไฟฟ้าสมองขณะการสร้างภาพในจินตนาการโดยตั้งใจและไม่ตั้งใจเปรียบเทียบระหว่างกลุ่มที่มีภาวะไร้จินตนาการและกลุ่มควบคุม" ซึ่งมีวัตถุประสงค์เพื่อเปรียบเทียบความแตกต่างของความสามารถในการจินตนาการระหว่างกลุ่มคนทั่วไปและกลุ่มที่มีภาวะไร้จินตนาการในเชิงพฤติกรรมและการทำงานของสมอง</p>
+                
+                <p><strong>เหตุผลความเป็นมา</strong></p>
+                <p>เนื่องด้วยความสามารถในการจินตนาการหรือสร้างภาพภายในหัวของมนุษย์นั้นเป็นสิ่งที่เกิดขึ้นทั่วไปในชีวิตประจำวัน อย่างไรก็ตามมีประชากรบางกลุ่มที่ไม่มีความสามารถดังกล่าวหรือไม่สามารถสร้างภาพหรือจินตนาการถึงภาพที่ไม่ได้อยู่ตรงหน้าได้ซึ่งเรียกว่าผู้ที่มีภาวะไร้จินตนาการในปัจจุบันการศึกษาในระดับการวัดการทำงานของคลื่นไฟฟ้าสมองในขณะจินตนาการในผู้ที่มีภาวะดังกล่าวยังมีค่อนข้างน้อย ซึ่งการศึกษาเปรียบเทียบการทำงานของสมองระหว่างกลุ่มที่มีความสามารถในการจินตนาการที่แตกต่างกันนั้นจึงมีความสำคัญอย่างมากเพื่อที่จะเข้าใจกระบวนการทำงานของสมองที่เกิดขึ้นในระหว่างการเกิดจินตนาการและเพื่อที่จะศึกษาสาเหตุในระดับการเปลี่ยนแปลงของคลื่นไฟฟ้าสมองที่ส่งผลทำให้การจินตนาการในแต่ละคนต่างกันออกไปโดยเฉพาะผู้ที่มีภาวะไร้จินตนาการ
+                จินตนาการ ดังนั้นทางคณะผู้วิจัยจึงวางแผนที่จะทำการศึกษาความแตกต่างของกระบวนการจินตนาการทั้งโดยตั้งใจและโดยไม่ตั้งใจเปรียบเทียบกันระหว่างกลุ่มที่มีภาวะไร้จินตนาการกับกลุ่มควบคุมที่ที่ความสามารถในการจินตนาการปกติ</p>
+
+                <p>ก่อนที่ท่านจะตัดสินใจเข้าร่วมการศึกษาดังกล่าว ขอให้ท่านอ่านเอกสารชี้แจงข้อมูลคำอธิบายสำหรับผู้เข้าร่วมโครงการวิจัยโดยละเอียด เพื่อให้ท่านเข้าถึงวัตถุประสงค์ ความเสี่ยง ประโยชน์ และสิทธิของท่านอย่างครบถ้วน ทั้งนี้ท่านสามารถขอคำแนะนำในการเข้าร่วมโครงการวิจัยนี้จากครอบครัว เพื่อน หรือแพทย์ประจำตัวของท่านได้ ท่านมีเวลาอย่างเพียงพอในการตัดสินใจโดยอิสระ</p>
+                
+                <p>1. การศึกษานี้มีวัตถุประสงค์เพื่อเปรียบเทียบความแตกต่างของความสามารถในการจินตนาการระหว่างกลุ่มคนทั่วไปและกลุ่มที่มีภาวะไร้จินตนาการในเชิงพฤติกรรมและการทำงานของสมอง</p>
+                <p>2.	ท่านเป็นผู้มีสิทธิในการเข้าร่วมการศึกษา หากท่านมีคุณสมบัติทุกข้อดังต่อไปนี้</p>
+                <p>&emsp;2.1 อายุ 18-70 ปี </strong></p>
+                <p>&emsp;2.2 สามารถอ่านและตอบแบบสอบถามได้ด้วยตนเอง</p>
+                <p>&emsp;2.3 มีความสามารถในการอ่านและแปลภาษาอังกฤษได้ดี โดยเทียบจากคะแนนวัดระดับความสามารถทางภาษาอังกฤษเทียบเท่าระดับ B2 โดยใช้เกณฑ์ดังต่อไปนี้ </p>
+                <p>&emsp; &nbsp;i.	CU-TEP มากกว่าหรือเท่ากับ 70 คะแนน หรือ</p>
+                <p>&emsp; &nbsp;ii.	TOEFL ITP มากกว่าหรือเท่ากับ 543 คะแนน หรือ IBT มากกว่าหรือเท่ากับ 72 คะแนน หรือ</p>
+                <p>&emsp; &nbsp;iii.	IETLS Reading มากกว่า 6 คะแนน</p>
+
+                <p>3.	กระบวนการที่เกี่ยวข้องกับการศึกษาโดยจะขอให้ท่านกรอกแบบสอบถามความสามารถในการจินตนาการโดยใช้แบบทดสอบ  Vividness of Visual Imagery Questionnaire หรือ VVIQ โดยมีทั้งหมด 16 ข้อ โดยในแต่ละข้อจะมีระบุคำชี้แจงให้ท่านจินตนาการตามคำบรรยายจากนั้นให้ท่านเลือกตอบระดับความชัดเจนของภาพที่ปรากฏเมื่อท่านจินตนาการโดยแบ่งเป็นความชัดเจน 5 ระดับ ใช้เวลาประมาณ 10 ถึง 15 นาที ต่อมาจะเป็นแบบทดสอบจะเป็นการทดสอบเชิงพฤติกรรม Progressive silhouette task ซึ่งจะให้อาสาสมัครดูภาพเงาของสัตว์หรือสิ่งของแล้วให้ตอบว่าภาพที่ดูอยู่นั้นเป็นภาพของอะไรโดยการพิมพ์คำตอบลงบนเว็บไซต์ใช้เวลาประมาณ 10 ถึง 15 นาที </p>
+                <p>4.	การวิจัยครั้งนี้มีความเสี่ยงไม่เกินความเสี่ยงเล็กน้อยหรือความเสี่ยงที่พบได้ในชีวิตประจำวัน ท่านอาจเกิดอาการข้างเคียง หรือความไม่สบาย โดยท่านสามารถถอนตัวจากการศึกษาเมื่อไรก็ได้ โดยผู้เข้าร่วมไม่ได้รับผลกระทบใด ๆ ทั้งสิ้น</p>
+                <p>5.	ผู้เข้าร่วมวิจัยจะไม่ได้รับประโยชน์ใดๆจากการเข้าร่วมในการวิจัยครั้งนี้ แต่ผลการศึกษาที่ได้จะเตรียมความรู้พื้นฐานไปขยายผลในกลุ่มที่มีภาวะไร้จินตนาการทั้งในด้านการเข้ากลไกของระบบประสาทในช่วงการจินตนาการโดยตั้งใจและไม่ตั้งใจและการปรับตัวของระบบประสาทระหว่างการจินตนาการโดยไม่ตั้งใจ</p>
+                <p>6.	ข้อมูลที่อาจนำไปสู่การเปิดเผยตัวท่าน จะได้รับการปกปิดโดยจะใช้รหัสแทนชื่อ และจะไม่เปิดเผยแก่สาธารณชน </p>
+                <p>7.	ท่านไม่ต้องมีค่าใช้จ่ายในการเข้าร่วมโครงการวิจัย </p>
+                <p>8.   สิทธิ์ของผู้เข้าร่วมในโครงการวิจัย ในฐานะที่ท่านเป็นผู้เข้าร่วมในโครงการวิจัย ท่านจะมีสิทธิ์ดังต่อไปนี้ </p>
+                <p>&emsp;        8.1.	ท่านจะได้รับทราบถึงลักษณะและวัตถุประสงค์ของการวิจัยในครั้งนี้</p>
+                <p>&emsp;        8.2.	ท่านจะได้รับการอธิบายเกี่ยวกับระเบียบวิธีการของการวิจัยทางการแพทย์ รวมทั้งยาและอุปกรณ์ที่ใช้ในการวิจัยครั้งนี้</p>
+                <p>&emsp;        8.3.	ท่านจะได้รับการอธิบายถึงความเสี่ยงและความไม่สบายที่จะได้รับจากการวิจัย</p>
+                <p>&emsp;        8.4.	ท่านจะได้รับการอธิบายถึงประโยชน์ที่ท่านอาจจะได้รับจากการวิจัย</p>
+                <p>&emsp;        8.5.	ท่านจะได้รับทราบแนวทางในการรักษา ในกรณีที่พบโรคแทรกซ้อนภายหลังการเข้าร่วมในโครงการวิจัย</p>
+                <p>&emsp;        8.7.	ท่านจะได้รับทราบว่าการยินยอมเข้าร่วมในโครงการวิจัยนี้ ท่านสามารถขอถอนตัวจากโครงการเมื่อไรก็ได้ โดยผู้เข้าร่วมวิจัยสามารถขอถอนตัวจากโครงการโดยไม่ได้รับผลกระทบใด ๆ ทั้งสิ้น</p>
+                <p>&emsp;        8.8.	ท่านมีสิทธิ์ในการตัดสินใจว่าจะเข้าร่วมในโครงการวิจัยหรือไม่ก็ได้ โดยปราศจากการใช้อิทธิพลบังคับข่มขู่ หรือการหลอกลวง</p>
+                <p>9.	หากท่านมีข้อสงสัยหรือต้องการข้อมูลเพิ่มเติม กรุณาติดต่อ นายแพทย์นิธิศ สิงห์โตขำ โทรศัพท์ 095-589-5777 (ตลอด 24 ชั่วโมง) </p>
+                <p>10.	หากอาสาสมัครยินดีเข้าร่วมสามารถกดเข้าสู่แบบทดสอบได้เลย โดยไม่ต้องเปิดเผยตัวเอง และผู้วิจัยสามารถเข้าไปตรวจสอบบันทึกข้อมูลของท่านได้ แม้จะสิ้นสุดโครงการวิจัยแล้วก็ตาม หากท่านต้องการยกเลิกการให้ความยินยอมดังกล่าว ท่านสามารถแจ้ง หรือเขียนบันทึกขอยกเลิกการให้คำยินยอม โดยส่งไปที่นายแพทย์นิธิศ สิงห์โตขำ ศูนย์ประสาทศาสตร์ ตึกสธ.ชั้น 11โรงพยาบาลจุฬาลงกรณ์สภากาชาดไทย 1873 ถ.พระรามที่ 4 แขวงปทุมวัน เขตปทุมวัน กรุงเทพมหานคร 10330 </p>
+                <p>11.	หลังอาสาสมัครทำการทดสอบในส่วนแรกเสร็จสิ้นแล้ว สามารถเลือกความจำนงค์เพื่อเป็นตัวแทนอาสาสมัครในส่วนที่สองของโครงการวิจัยซึ่งผู้วิจัยจะติดต่อนัดหมายอาสาสมัครมาเก็บข้อมูลที่ศูนย์ประสาทศาสตร์ ตึกสธ.ชั้น 11 โรงพยาบาลจุฬาลงกรณ์สภากาชาดไทย โดยการทดสอบในส่วนที่ 2 นี้จะมีค่าชดเชยการเสียเวลาสำหรับอาสาสมัครทุกราย โดยหากสนใจจะให้อาสาสมัครระบุช่องทางการติดต่อที่สะดวกหรือติดต่อมาที่ผู้รับผิดชอบโครงการวิจัยเพื่อทำการนัดหมายเพื่อชี้แจงรายละเอียดอีกครั้ง </p>
+                <p>12.	หากท่านไม่ได้รับการปฏิบัติตามที่ปรากฎในเอกสารข้อมูลคำอธิบายสำหรับผู้เข้าร่วมวิจัย ท่านสามารถร้องเรียนได้ที่ สำนักงานคณะกรรมการจริยธรรมการวิจัย คณะแพทยศาสตร์ จุฬาลงกรณ์มหาวิทยาลัย ตึกอานันทมหิดลชั้น 3 โรงพยาบาลจุฬาลงกรณ์ ถนนพระราม 4 ปทุมวัน กรุงเทพฯ 10330 โทรศัพท์ 0-2256-4493 ในเวลาราชการ หรือ e-mail : medchulairb@chula.ac.th </p>
+                
+                <p>ทางคณะผู้วิจัยขอขอบพระคุณในความร่วมมือของท่านมา ณ ที่นี้</p>                   
+            </div>
+            
+            <button class="btn" onclick="showParticipantInfo()">ยินยอม</button>
+        </div>
+
+        <!-- Participant Information Page -->
+        <div id="participant-section" class="section">
+            <h1>ข้อมูลผู้เข้าร่วมการวิจัย</h1>
+            
+            <div class="form-group">
+                <label for="participant-id">Participant ID:</label>
+                <input type="text" id="participant-id" placeholder="Enter your participant ID" required>
+            </div>
+            <div class="form-group">
+                <label for="participant-age">Age:</label>
+                <input type="number" id="participant-age" placeholder="Enter your age" min="18" max="100" required>
+            </div>
+            <div class="form-group">
+                <label for="participant-gender">Gender:</label>
+                <select id="participant-gender" required>
+                    <option value="male">Male</option>
+                    <option value="female">Female</option>
+                    <option value="other">Other</option>
+                </select>
+            </div>
+            
+            <div style="display: flex; gap: 15px; justify-content: center; margin-top: 30px;">
+                <button class="btn" onclick="showInstruction()" style="background: #6c757d;">กลับ</button>
+                <button class="btn" onclick="startStudy()">เริ่มทำแบบทดสอบ</button>
+            </div>
+        </div>
+
+        <!-- VVIQ Questionnaire -->
+        <div id="vviq-section" class="section">
+            <h2>Vividness of Visual Imagery Questionnaire (VVIQ)</h2>
+            <div class="progress-bar">
+                <div class="progress-fill" id="vviq-progress"></div>
+            </div>
+            
+            <div id="vviq-questions">
+                <!-- Questions will be populated by JavaScript -->
+            </div>
+            
+            <button class="btn" id="vviq-next" onclick="nextVVIQQuestion()" style="display: none;">Next Question</button>
+            <button class="btn" id="vviq-complete" onclick="completeVVIQ()" style="display: none;">Complete VVIQ</button>
+        </div>
+
+        <!-- Progressive Silhouette Task -->
+        <div id="silhouette-section" class="section">
+            <h2>Progressive Silhouette Task</h2>
+            <div id="silhouette-instructions">
+                <p class="question-text">
+                    In this task, you will see progressively clearer images of objects. 
+                    Your goal is to identify each object as quickly as possible.
+                </p>
+                <p class="question-text">
+                    Type your answer in the text box below each image and click "Submit Answer" to check.
+                    If you're incorrect, the image will become clearer until you get it right.
+                </p>
+                <button class="btn" onclick="startSilhouetteTask()">Start Task</button>
+            </div>
+
+            <div id="silhouette-task" class="hidden">
+                <div class="progress-bar">
+                    <div class="progress-fill" id="silhouette-progress"></div>
+                </div>
+                
+                <div class="stimulus-container">
+                    <img id="stimulus-image" class="stimulus-image" alt="Stimulus">
+                    <div class="answer-input">
+                        <input type="text" id="answer-input" placeholder="Type your answer here...">
+                        <button class="btn" onclick="submitAnswer()">Submit Answer</button>
+                    </div>
+                </div>
+
+                <div id="feedback" class="feedback hidden"></div>
+            </div>
+        </div>
+
+        <!-- Results Section -->
+        <div id="results-section" class="section">
+            <h2>Study Complete!</h2>
+            <div class="results">
+                <h3>VVIQ Results</h3>
+                <p>Total Score: <span id="vviq-score">0</span></p>
+                
+                <h3>Silhouette Task Results</h3>
+                <p>Total Objects: <span id="total-objects">0</span></p>
+                <p>Average Attempts per Object: <span id="avg-attempts">0</span></p>
+            </div>
+
+            <div class="instruction-text">
+                <p><strong>การเข้าร่วมการศึกษาส่วนที่ 2</strong></p>
+                <p>ทางคณะผู้วิจัยขอแสดงความขอบคุณเป็นอย่างยิ่งที่ท่านได้สละเวลาทำแบบทดสอบในโครงการวิจัยนี้ โดยในส่วนที่สองของการศึกษามีจุดประสงค์เพื่อศึกษาความแตกต่างของคลื่นไฟฟ้าสมองขณะจินตนาการโดยตั้งใจและไม่ตั้งใจเปรียบเทียบระหว่างกลุ่มที่มีภาวะไร้จินตนาการและกลุ่มควบคุม</p>
+                <p>หากท่านสนใจเข้าร่วมการศึกษาส่วนที่ 2 กรุณาเลือก "สนใจ" และกรอกอีเมลหรือหมายเลขโทรศัพท์ เพื่อให้ทีมวิจัยสามารถติดต่อท่านได้</p>
+            </div>
+
+            <div class="button-row">
+                <button class="btn" onclick="handleSecondPartChoice(true)">สนใจ</button>
+                <button class="btn" onclick="handleSecondPartChoice(false)" style="background: #6c757d;">ไม่สนใจ</button>
+            </div>
+        </div>
+
+        <div id="contact-section" class="section">
+            <h2>Contact Information for Part 2</h2>
+            <div class="instruction-text">
+                <p>Please leave your email address or telephone number if you would like us to contact you about the second part of the study.</p>
+                <p>Your contact information will only be used for follow-up about the second part.</p>
+            </div>
+
+            <div class="form-group">
+                <label for="contact-email">Email:</label>
+                <input type="email" id="contact-email" placeholder="Enter your email address">
+            </div>
+
+            <div class="form-group">
+                <label for="contact-phone">Telephone Number:</label>
+                <input type="tel" id="contact-phone" placeholder="Enter your telephone number">
+            </div>
+
+            <div class="button-row">
+                <button class="btn" onclick="showSection('results-section')" style="background: #6c757d;">Back</button>
+                <button class="btn" onclick="saveSecondPartContact()">Submit</button>
+            </div>
+        </div>
+
+        <div id="final-section" class="section">
+            <h2>Thank You</h2>
+            <div class="results">
+                <p>ทางผู้วิจัยขอขอบพระคุณเป็นอย่างยิ่ง</p>
+                <p id="final-message">Your response has been recorded.</p>
+                <button class="btn" onclick="downloadResults()">Download Results</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Global variables
+        let participantData = {};
+        let resultsSubmitted = false;
+        let currentVVIQQuestion = 0;
+        let currentObject = 0;
+        let currentSilhouetteLevel = 0;
+        let vviqAnswers = [];
+        let silhouetteResults = [];
+        let silhouetteTextAnswers = []; // Store all text answers
+        let randomizedObjectOrder = []; // Store randomized order of objects
+        
+        // VVIQ Questions
+        const vviQQuestions = [
+            "Think of some relative or friend whom you frequently see (but who is not with you at present) and consider carefully the picture that comes before your mind’s eye. The exact contours of face, head, shoulders and body.",
+            "Think of some relative or friend whom you frequently see (but who is not with you at present) and consider carefully the picture that comes before your mind’s eye. Characteristic poses of head, attitudes of body etc.",
+            "Think of some relative or friend whom you frequently see (but who is not with you at present) and consider carefully the picture that comes before your mind’s eye. The precise carriage, length of step etc., in walking.",
+            "Think of some relative or friend whom you frequently see (but who is not with you at present) and consider carefully the picture that comes before your mind’s eye. The different colors worn in some familiar clothes.",
+            "Visualise a rising sun. Consider carefully the picture that comes before your mind’s eye. The sun rising above the horizon into a hazy sky.",
+            "Visualise a rising sun. Consider carefully the picture that comes before your mind’s eye. The sky clears and surrounds the sun with blueness.",
+            "Visualise a rising sun. Consider carefully the picture that comes before your mind’s eye. Clouds. A storm blows up with flashes of lightning.",
+            "Visualise a rising sun. Consider carefully the picture that comes before your mind’s eye. A rainbow appears.",
+            "Think of the front of a shop which you often go to. Consider the picture that comes before your mind’s eye. The overall appearance of the shop from the opposite side of the road.",
+            "Think of the front of a shop which you often go to. Consider the picture that comes before your mind’s eye. A window display including colours, shapes and details of individual items for sale.",
+            "Think of the front of a shop which you often go to. Consider the picture that comes before your mind’s eye. You are near the entrance. The colour, shape and details of the door.",
+            "Think of the front of a shop which you often go to. Consider the picture that comes before your mind’s eye. You enter the shop and go to the counter. The counter Assistant serves you. Money changes hands.",
+            "Finally think of a country scene which involves trees, mountains and a lake. Consider the picture that comes before your mind’s eye.The contours of the landscape.",
+            "Finally think of a country scene which involves trees, mountains and a lake. Consider the picture that comes before your mind’s eye.The colour and shape of the lake.",
+            "Finally think of a country scene which involves trees, mountains and a lake. Consider the picture that comes before your mind’s eye.The colour and shape of the trees.",
+            "Finally think of a country scene which involves trees, mountains and a lake. Consider the picture that comes before your mind’s eye. A strong wind blows on the trees and on the lake causing reflections in the water."
+        ];
+
+        const vviQChoices = [
+            "No image at all, you only 'know' that you are thinking of the object",
+            "Unclear and vague",
+            "Moderately clear and vivid",
+            "Clear and reasonably vivid",
+            "Perfectly clear and as vivid as normal vision"
+        ];
+
+        // Object answers from your JSON file
+        const objectAnswers = {
+            "01": ["banana", "กล้วย"],
+            "02": ["bottle", "ขวด", "ขวดน้ำ", "bottle of water"],
+            "03": ["brush", "แปรง"],
+            "04": ["chair", "เก้าอี้"],
+            "05": ["bed", "เตียง", "เตียงนอน"],
+            "06": ["flash light", "ไฟฉาย", "flashlight"],
+            "07": ["hair dryer", "ไดร์เป่าผม","hairdrier","hairdryer"],
+            "08": ["guitar", "กีตาร์"],
+            "09": ["dumbbell", "dumbell", "ดัมเบล", "ที่ยกน้ำหนัก"],
+            "10": ["hat", "หมวก","cap"],
+            "11": ["hammer", "ค้อน"],
+            "12": ["knife", "มีด"],
+            "13": ["pan", "กระทะ", "frying pan"],
+            "14": ["light", "light bulb", "หลอดไฟ", "lightbulb"],
+            "15": ["pineapple", "สับปะรด"],
+            "16": ["scissor", "กรรไกร","scissors"],
+            "17": ["car", "รถ", "รถยนต์"],
+            "18": ["boat", "เรือ","ship"],
+            "19": ["toothbrush", "tooth brush", "แปรงสีฟัน"],
+            "20": ["teddy bear", "doll", "ตุ๊กตาหมี", "ตุ๊กตา"],
+            "21": ["teapot", "กาน้ำชา", "กาน้ำ","pot"],
+            "22": ["shoe", "รองเท้า", "รองเท้าเท้า","shoes"],
+            "23": ["umbrella", "ร่ม"],
+            "24": ["plane", "เครื่องบิน","airplane"]
+        };
+        // Show instruction page
+        function showInstruction() {
+            showSection('instruction-section');
+        }
+        
+        // Show participant information page
+        function showParticipantInfo() {
+            showSection('participant-section');
+        }
+
+        // Start the study
+        function startStudy() {
+            const participantId = document.getElementById('participant-id').value;
+            const participantAge = document.getElementById('participant-age').value;
+            
+            if (!participantId || !participantAge) {
+                alert('Please fill in both Participant ID and Age');
+                return;
+            }
+            
+            participantData = {
+                id: participantId,
+                age: participantAge,
+                gender: document.getElementById('participant-gender').value,
+                secondPartInterest: null,
+                contactInfo: '',
+                contactEmail: '',
+                contactPhone: '',
+                startTime: new Date().toISOString()
+            };
+            resultsSubmitted = false;
+            document.getElementById('contact-email').value = '';
+            document.getElementById('contact-phone').value = '';
+            document.getElementById('final-message').textContent = 'Your response has been recorded.';
+            
+            showSection('vviq-section');
+            startVVIQ();
+        }
+
+        // Show specific section
+        function showSection(sectionId) {
+            document.querySelectorAll('.section').forEach(section => {
+                section.classList.remove('active');
+            });
+            document.getElementById(sectionId).classList.add('active');
+        }
+
+        // Start VVIQ
+        function startVVIQ() {
+            currentVVIQQuestion = 0;
+            vviqAnswers = [];
+            displayVVIQQuestion();
+        }
+
+        // Display VVIQ question
+        function displayVVIQQuestion() {
+            const questionsContainer = document.getElementById('vviq-questions');
+            const progressFill = document.getElementById('vviq-progress');
+            
+            // Update progress
+            const progress = ((currentVVIQQuestion + 1) / vviQQuestions.length) * 100;
+            progressFill.style.width = progress + '%';
+            
+            // Display question
+            questionsContainer.innerHTML = `
+                <div class="question-container">
+                    <p class="question-text">${vviQQuestions[currentVVIQQuestion]}</p>
+                    <div class="choices">
+                        ${vviQChoices.map((choice, index) => `
+                            <button class="choice-btn" onclick="selectVVIQChoice(${index})">${choice}</button>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+            
+            // Show/hide buttons
+            document.getElementById('vviq-next').style.display = 'none';
+            document.getElementById('vviq-complete').style.display = 'none';
+        }
+
+        // Select VVIQ choice
+        function selectVVIQChoice(choiceIndex) {
+            // Remove previous selections
+            document.querySelectorAll('.choice-btn').forEach(btn => btn.classList.remove('selected'));
+            
+            // Select current choice
+            event.target.classList.add('selected');
+            
+            // Store answer
+            vviqAnswers[currentVVIQQuestion] = choiceIndex;
+            
+            // Show next button
+            if (currentVVIQQuestion < vviQQuestions.length - 1) {
+                document.getElementById('vviq-next').style.display = 'block';
+            } else {
+                document.getElementById('vviq-complete').style.display = 'block';
+            }
+        }
+
+        // Next VVIQ question
+        function nextVVIQQuestion() {
+            if (vviqAnswers[currentVVIQQuestion] === undefined) {
+                alert('Please select an answer before continuing');
+                return;
+            }
+            
+            currentVVIQQuestion++;
+            displayVVIQQuestion();
+        }
+
+        // Complete VVIQ
+        function completeVVIQ() {
+            if (vviqAnswers[currentVVIQQuestion] === undefined) {
+                alert('Please select an answer before continuing');
+                return;
+            }
+            
+            showSection('silhouette-section');
+        }
+
+        // Generate randomized order of objects
+        function generateRandomizedObjectOrder() {
+            // Create array of object keys (01, 02, 03, ..., 24)
+            const objectKeys = Object.keys(objectAnswers);
+            
+            // Fisher-Yates shuffle algorithm for unbiased randomization
+            randomizedObjectOrder = [...objectKeys];
+            for (let i = randomizedObjectOrder.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [randomizedObjectOrder[i], randomizedObjectOrder[j]] = [randomizedObjectOrder[j], randomizedObjectOrder[i]];
+            }
+            
+            console.log('Randomized object order:', randomizedObjectOrder);
+        }
+        
+        // Start silhouette task
+        function startSilhouetteTask() {
+            currentObject = 0;
+            currentSilhouetteLevel = 0;
+            silhouetteResults = [];
+            silhouetteTextAnswers = []; // Reset text answers
+            
+            // Generate randomized order of objects
+            generateRandomizedObjectOrder();
+            
+            document.getElementById('silhouette-instructions').classList.add('hidden');
+            document.getElementById('silhouette-task').classList.remove('hidden');
+            
+            displayNextStimulus();
+        }
+
+        // Display next stimulus
+        function displayNextStimulus() {
+            if (currentObject >= Object.keys(objectAnswers).length) {
+                completeSilhouetteTask();
+                return;
+            }
+            
+            const objectKey = randomizedObjectOrder[currentObject];
+            const silhouetteLevel = 90 - currentSilhouetteLevel * 10;
+            const imagePath = `https://github.com/bank-nithit/imagery/stimulus/obj${objectKey}/${objectKey}_sil_${silhouetteLevel}.png`;
+            
+            // Debug: log the image path
+            console.log('Loading image:', imagePath);
+            
+            document.getElementById('stimulus-image').src = imagePath;
+            document.getElementById('answer-input').value = '';
+            document.getElementById('feedback').classList.add('hidden');
+            
+            // Update progress
+            const progress = ((currentObject + 1) / Object.keys(objectAnswers).length) * 100;
+            document.getElementById('silhouette-progress').style.width = progress + '%';
+        }
+
+        // Submit answer
+        function submitAnswer() {
+            const answer = document.getElementById('answer-input').value.trim();
+            const answerLower = answer.toLowerCase();
+            const objectKey = randomizedObjectOrder[currentObject];
+            const correctAnswers = objectAnswers[objectKey];
+            
+            // Store the text answer
+            if (!silhouetteTextAnswers[currentObject]) {
+                silhouetteTextAnswers[currentObject] = [];
+            }
+            silhouetteTextAnswers[currentObject].push({
+                answer: answer,
+                level: currentSilhouetteLevel,
+                timestamp: new Date().toISOString()
+            });
+            
+            if (correctAnswers.some(correct => correct.toLowerCase() === answerLower)) {
+                // Correct answer
+                showFeedback('Correct!', 'correct');
+                silhouetteResults.push({
+                    object: objectKey,
+                    attempts: currentSilhouetteLevel + 1,
+                    level: currentSilhouetteLevel
+                });
+                
+                setTimeout(() => {
+                    currentObject++;
+                    currentSilhouetteLevel = 0;
+                    displayNextStimulus();
+                }, 1500);
+            } else {
+                // Incorrect answer
+                showFeedback('Incorrect, please try again', 'incorrect');
+                currentSilhouetteLevel++;
+                
+                if (currentSilhouetteLevel >= 10) {
+                    // Maximum attempts reached, move to next object
+                    silhouetteResults.push({
+                        object: objectKey,
+                        attempts: 10,
+                        level: 9
+                    });
+                    
+                    setTimeout(() => {
+                        currentObject++;
+                        currentSilhouetteLevel = 0;
+                        displayNextStimulus();
+                    }, 2000);
+                } else {
+                    // Show clearer image
+                    setTimeout(() => {
+                        displayNextStimulus();
+                    }, 1000);
+                }
+            }
+        }
+
+        
+        function sendResultsToServer() {
+            if (resultsSubmitted) {
+                return;
+            }
+
+            const results = {
+                participant: participantData,
+                vviq: {
+                    answers: vviqAnswers,
+                    score: vviqAnswers.reduce((sum, answer) => sum + (answer + 1), 0)
+                },
+                silhouette: silhouetteResults,
+                silhouetteTextAnswers: silhouetteTextAnswers, // Include all text answers
+                randomizedObjectOrder: randomizedObjectOrder, // Include the randomized order
+                timestamp: new Date().toISOString()
+            };
+
+            fetch("https://n8n-amalgam.keendev.net/webhook/nithit-circle-thing",
+                {
+                headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'text/plain'
+                },
+                method: "POST",
+                body: JSON.stringify(results, null, 2) 
+            });
+
+            resultsSubmitted = true;
+        }
+
+        // Show feedback
+        function showFeedback(message, type) {
+            const feedback = document.getElementById('feedback');
+            feedback.textContent = message;
+            feedback.className = `feedback ${type}`;
+            feedback.classList.remove('hidden');
+        }
+
+        // Complete silhouette task
+        function completeSilhouetteTask() {
+            showSection('results-section');
+            displayResults();
+        }
+
+        function handleSecondPartChoice(wantsToParticipate) {
+            participantData.secondPartInterest = wantsToParticipate;
+
+            if (wantsToParticipate) {
+                showSection('contact-section');
+                return;
+            }
+
+            participantData.contactInfo = '';
+            participantData.contactEmail = '';
+            participantData.contactPhone = '';
+            finishStudy('You selected not to join the second part.');
+        }
+
+        function saveSecondPartContact() {
+            const contactEmail = document.getElementById('contact-email').value.trim();
+            const contactPhone = document.getElementById('contact-phone').value.trim();
+
+            if (!contactEmail && !contactPhone) {
+                alert('Please enter your email address or telephone number.');
+                return;
+            }
+
+            participantData.contactEmail = contactEmail;
+            participantData.contactPhone = contactPhone;
+            participantData.contactInfo = [contactEmail, contactPhone].filter(Boolean).join(' | ');
+            finishStudy('Thank you. We will use this contact information to reach you about the second part.');
+        }
+
+        function finishStudy(message) {
+            document.getElementById('final-message').textContent = message;
+            participantData.endTime = new Date().toISOString();
+            sendResultsToServer();
+            showSection('final-section');
+        }
+
+        // Display results
+        function displayResults() {
+            // Calculate VVIQ score (direct scoring: 1=no image, 5=perfectly vivid)
+            const vviqScore = vviqAnswers.reduce((sum, answer) => sum + (answer + 1), 0);
+            document.getElementById('vviq-score').textContent = vviqScore;
+            
+            // Calculate silhouette results
+            const totalObjects = silhouetteResults.length;
+            const totalAttempts = silhouetteResults.reduce((sum, result) => sum + result.attempts, 0);
+            const avgAttempts = totalObjects > 0 ? (totalAttempts / totalObjects).toFixed(2) : 0;
+            
+            document.getElementById('total-objects').textContent = totalObjects;
+            document.getElementById('avg-attempts').textContent = avgAttempts;
+        }
+
+        // Download results
+        function downloadResults() {
+            const results = {
+                participant: participantData,
+                vviq: {
+                    answers: vviqAnswers,
+                    score: vviqAnswers.reduce((sum, answer) => sum + (answer + 1), 0)
+                },
+                silhouette: silhouetteResults,
+                silhouetteTextAnswers: silhouetteTextAnswers, // Include all text answers
+                randomizedObjectOrder: randomizedObjectOrder, // Include the randomized order
+                timestamp: new Date().toISOString()
+            };
+            
+            const dataStr = JSON.stringify(results, null, 2);
+            const dataBlob = new Blob([dataStr], {type: 'application/json'});
+            
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(dataBlob);
+            link.download = `imagery_task_results_${participantData.id}.json`;
+            link.click();
+        }
+
+        // Handle Enter key in answer input
+        document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('answer-input').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    submitAnswer();
+                }
+            });
+        });
+
+
+
+    </script>
+</body>
+</html>
